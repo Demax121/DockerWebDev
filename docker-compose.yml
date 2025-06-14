@@ -46,7 +46,7 @@ services:
       - "5173:5173"
     volumes:
       - ./frontend:/app
-      - /app/node_modules  # This prevents host node_modules from overriding container's
+      - node_modules_cache:/app/node_modules  # This prevents host node_modules from overriding container's
     depends_on:
       - postgres
     networks:
@@ -97,6 +97,7 @@ services:
 volumes:
   postgres_data:
   pgadmin_data:
+  node_modules_cache:
 
 networks:
   app-network:
