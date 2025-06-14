@@ -20,8 +20,5 @@ COPY . .
 ENV VITE_PORT=$PORT_REFERENCE
 ENV VITE_HOST=${HOST_REFERENCE}
 
-# Expose Vite dev port
-EXPOSE 5173
-
 # Run Vite dev server
 CMD ["bun", "run", "dev"]
