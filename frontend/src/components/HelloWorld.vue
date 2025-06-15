@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useLinkStore } from '../stores/linkStore'
 
 const databaseStatus = ref('Loading...')
 const imageLoaded = ref(false)
+const linkStore = useLinkStore()
 
 const handleImageLoad = () => {
   imageLoaded.value = true
@@ -10,7 +12,8 @@ const handleImageLoad = () => {
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://localhost:6969/test.php')
+    const databaseApiUrl = linkStore.getPhpApiUrl('test.php')
+    const response = await fetch(databaseApiUrl)
     const data = await response.json()
     databaseStatus.value = data.success ? 'Connected' : 'Error'
   } catch (error) {
@@ -25,7 +28,7 @@ onMounted(async () => {
     <h2>Database status: <span :class="{ connected: databaseStatus === 'Connected' }">{{ databaseStatus }}</span></h2>
     <div class="image-wrapper">
       <img 
-        src="http://localhost:9091/images/placeholder.webp" 
+        :src="`${linkStore.getLink('cdnURL')}images/placeholder.webp`" 
         alt="Placeholder image"
         @load="handleImageLoad"
       />

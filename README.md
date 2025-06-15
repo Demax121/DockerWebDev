@@ -65,62 +65,65 @@ HOST_REFERENCE=0.0.0.0
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+gh repo clone <repository-url>
 cd devStack
 ```
 
 2. Start all services:
 ```bash
-docker-compose up -d
-```
-
-3. Access the applications:
-   - **Frontend**: http://localhost:5173
-   - **Backend API**: http://localhost:6969
-   - **pgAdmin**: http://localhost:5050
-   - **CDN**: http://localhost:9091
-
-### Development Mode
-
-For development with hot reload:
-```bash
+docker compose build
 docker-compose up
 ```
+
+### 3. Access Your Applications
+
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| **Frontend** | http://localhost:5173 | - |
+| **Backend API** | http://localhost:6969 | - |
+| **pgAdmin** | http://localhost:5050 | Email/Password from `.env` |
+| **CDN Assets** | http://localhost:9091 | - |
+
 
 ## 📁 Project Structure
 
 ```
 devStack/
-├── docker-compose.yml          # Main orchestration file
-├── .env                       # Environment variables (create this)
-├── frontend/                  # Vue.js application
-│   ├── src/                  # Source code
-│   ├── public/               # Static assets
-│   ├── package.json          # Node.js dependencies
-│   └── frontend.Dockerfile   # Frontend container
-├── backend/                   # PHP backend
-│   ├── php/                  # PHP source code
-│   ├── Caddyfile            # Caddy server configuration
-│   ├── caddy-server.Dockerfile
-│   └── php-manager.Dockerfile
-├── postgreSQL/               # Database setup
-│   ├── init.sql             # Database initialization
-│   ├── postgresDB.Dockerfile
-│   └── pgAdmin.Dockerfile
-└── CDN/                      # Content delivery
-    ├── assets/              # Static assets
-    ├── Caddyfile           # CDN server configuration
-    └── caddy-cdn.Dockerfile
+├── 🐳 docker-compose.yml          # Service orchestration
+├── 🔧 .env                        # Environment configuration
+├── 📖 README.md                   # This file
+├── 
+├── 🎨 frontend/                   # Vue.js Application
+│   ├── src/                      # Source code
+│   │   ├── components/           # Vue components
+│   │   ├── views/               # Page views
+│   │   ├── stores/              # Pinia stores
+│   │   └── main.js              # Application entry
+│   ├── public/                   # Static assets
+│   ├── package.json              # Dependencies
+│   ├── vite.config.js           # Vite configuration
+│   └── frontend.Dockerfile      # Container definition
+│
+├── ⚙️ backend/                    # PHP Backend
+│   ├── php/                      # PHP source code
+│   │   ├── api/                 # API endpoints
+│   │   ├── config/              # Configuration files
+│   │   └── index.php            # Main entry point
+│   ├── Caddyfile                # Web server config
+│   ├── caddy-server.Dockerfile  # Caddy container
+│   └── php-manager.Dockerfile   # PHP-FPM container
+│
+├── 🗄️ postgreSQL/                # Database Setup
+│   ├── init.sql                 # Database initialization
+│   ├── postgresDB.Dockerfile    # Database container
+│   └── pgAdmin.Dockerfile       # Admin UI container
+│
+└── 🌐 CDN/                       # Content Delivery
+    ├── assets/                   # Static files
+    ├── Caddyfile                # CDN server config
+    └── caddy-cdn.Dockerfile     # CDN container
 ```
 
-## 🛠️ Development
-
-### Frontend Development
-```bash
-cd frontend
-npm install
-npm run dev
-```
 
 ### Backend Development
 The PHP files are mounted as volumes, so changes are reflected immediately.
@@ -141,12 +144,6 @@ Access pgAdmin at http://localhost:5050 to manage your PostgreSQL database.
 2. **Environment variables**: Make sure `.env` file is properly configured
 3. **Docker permissions**: Ensure Docker daemon is running with proper permissions
 
-### Logs
-View service logs:
-```bash
-docker-compose logs [service-name]
-```
-
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -160,5 +157,3 @@ docker-compose logs [service-name]
 This project is open source and available under the [MIT License](LICENSE).
 
 ---
-
-**Happy coding! 🚀**
