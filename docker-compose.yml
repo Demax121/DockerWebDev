@@ -93,7 +93,6 @@ services:
       - app-network
     restart: unless-stopped
 
-
 volumes:
   postgres_data:
   pgadmin_data:
