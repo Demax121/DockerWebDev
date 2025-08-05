@@ -4,17 +4,23 @@ services:
       context: ./postgreSQL
       dockerfile: postgresDB.Dockerfile
       args:
-        - DB_USER=${POSTGRES_USER}
-        - DB_PASSWORD=${POSTGRES_PASSWORD}
-        - DB_NAME=${POSTGRES_DB}
-    container_name: postgres_db
-    restart: always
+        DB_USER: ${POSTGRES_USER}
+        DB_PASSWORD: ${POSTGRES_PASSWORD}
+        DB_NAME: ${POSTGRES_DB}
+    container_name: postgres_db_dev
+    restart: unless-stopped
     ports:
-      - "5432:5432"
+      - ${POSTGRES_PORT_EX}:${POSTGRES_PORT_NATIVE}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     networks:
-      - app-network
+      - app-network_dev
 
   pgadmin:
     build:
@@ -23,74 +29,79 @@ services:
       args:
         PGADMIN_EMAIL: ${PGADMIN_EMAIL}
         PGADMIN_PASSWORD: ${PGADMIN_PASSWORD}
-    container_name: pgadmin_ui  
-    restart: always
+    container_name: pgadmin_ui_dev
+    restart: unless-stopped
     ports:
-      - "5050:80"
+      - ${PGADMIN_PORT_EX}:${PGADMIN_PORT_NATIVE}
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
       - postgres
     networks:
-      - app-network
+      - app-network_dev
 
   frontend:
     build:
       context: ./frontend
       dockerfile: frontend.Dockerfile
       args:
-      - PORT_REFERENCE=${PORT_REFERENCE}
-      - HOST_REFERENCE=${HOST_REFERENCE}
-    container_name: vue_frontend
+        PORT_REFERENCE: ${PORT_REFERENCE}
+        HOST_REFERENCE: ${HOST_REFERENCE}
+    container_name: vue_frontend_dev
+    restart: unless-stopped
     ports:
-      - "5173:5173"
+      - ${FRONTEND_PORT_EX}:${FRONTEND_PORT_NATIVE}
     volumes:
       - ./frontend:/app
       - node_modules_cache:/app/node_modules  # This prevents host node_modules from overriding container's
     depends_on:
-      - postgres
+      - backend-server-caddy
     networks:
-      - app-network
+      - app-network_dev
 
   php:
     build:
       context: ./backend
       dockerfile: php-manager.Dockerfile
       args:
-        - POSTGRES_USER=${POSTGRES_USER}
-        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-        - POSTGRES_DB=${POSTGRES_DB}
-    container_name: php_manager
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB}
+    container_name: php_manager_dev
+    restart: unless-stopped
     volumes:
       - ./backend/php:/var/www/php
+    depends_on:
+      - postgres
     networks:
-      - app-network
+      - app-network_dev
 
   backend-server-caddy:
     build:
       context: ./backend
       dockerfile: caddy-server.Dockerfile
-    container_name: backend_server_caddy
+    container_name: backend_server_caddy_dev
+    restart: unless-stopped
     volumes:
       - ./backend/php:/var/www/php
     ports:
-      - "6969:80"
+      - ${BACKEND_CADDY_PORT_EX}:${BACKEND_CADDY_PORT_NATIVE}
     depends_on:
       - php
     networks:
-      - app-network
+      - app-network_dev
 
   cdn:
     build:
       context: ./CDN
       dockerfile: caddy-cdn.Dockerfile
-    container_name: caddy-cdn
+    container_name: caddy-cdn_dev
     ports:
-      - "9091:80"
+      - ${CDN_PORT_EX}:${CDN_PORT_NATIVE}
     volumes:
       - ./CDN/assets:/srv/assets:ro  # Read-only access to assets
     networks:
-      - app-network
+      - app-network_dev
     restart: unless-stopped
 
 volumes:
@@ -99,5 +110,5 @@ volumes:
   node_modules_cache:
 
 networks:
-  app-network:
+  app-network_dev:
     driver: bridge

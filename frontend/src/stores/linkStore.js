@@ -10,8 +10,8 @@ export const useLinkStore = defineStore('linkStore', {
   // State: Holds the base URLs for different services
   state: () => ({
     links: {
-      databaseApi: 'http://localhost:6969/',  // Base URL for PHP API endpoints
-      cdnURL: 'http://localhost:9091/',       // Base URL for CDN/static assets
+      databaseApi: 'http://localhost:8884/',  // Base URL for PHP API endpoints
+      cdnURL: 'http://localhost:8885/',       // Base URL for CDN/static assets
     },
   }),
   
